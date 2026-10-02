@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flashcards-JP</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef1f4;--panel:#fff;--ink:#1b2430;--mute:#66717f;--line:#d5dbe2;--ok:#0f766e;--no:#c2410c;--acc:#26466d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a22;--panel:#1d2530;--ink:#e8edf3;--mute:#93a0b0;--line:#313c4a;--ok:#2dd4bf;--no:#fb923c;--acc:#7aa7da}}
+:root[data-theme="dark"]{--bg:#141a22;--panel:#1d2530;--ink:#e8edf3;--mute:#93a0b0;--line:#313c4a;--ok:#2dd4bf;--no:#fb923c;--acc:#7aa7da}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+header{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header h1{font-size:17px;margin:0 auto 0 0}
+button,select,input[type=text]{font:inherit;color:var(--ink)}
+button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover:not(:disabled){border-color:var(--acc)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.dng{color:var(--no)}
+header .tab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+input[type=text],select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;max-width:100%}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.hide{display:none!important}
+/* edit */
+.edit{display:grid;grid-template-columns:260px 1fr;gap:16px}
+@media(max-width:760px){.edit{grid-template-columns:1fr}}
+.side,.cardsbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.deck{display:flex;align-items:center;gap:6px;padding:6px;border-radius:8px;cursor:pointer}
+.deck.on{background:color-mix(in srgb,var(--acc) 15%,transparent)}
+.deck .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.deck small,.mute{color:var(--mute)}
+.deck .mv{padding:1px 6px;font-size:12px}
+#saveMsg{font-size:13px;color:var(--mute)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.c{border:2px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);position:relative}
+.c.sel{border-color:var(--acc)}
+.c img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#000}
+.c .cap{display:flex;gap:6px;align-items:center;padding:4px 6px;font-size:13px}
+.c .cap span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c .cap button{padding:1px 8px;font-size:12px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--mute);margin-bottom:10px}
+.drop.over{border-color:var(--acc);color:var(--acc)}
+/* quiz */
+.setup{max-width:560px;margin:20px auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.setup label{display:flex;gap:8px;padding:5px 0}
+.stage{max-width:1024px;margin:0 auto}
+.info{display:flex;justify-content:space-between;color:var(--mute);margin-bottom:8px}
+.pic{position:relative;width:100%;aspect-ratio:1024/768;background:#000;border-radius:6px;overflow:hidden;cursor:pointer;user-select:none}
+.pic img{width:100%;height:100%;object-fit:contain;display:block}
+.cover{position:absolute;left:0;bottom:0;width:100%;height:10.03%;background:#000}
+.ctrl{display:flex;justify-content:center;gap:18px;margin-top:14px}
+.ctrl button{width:84px;height:84px;font-size:38px;border-radius:50%;border-width:2px;line-height:1}
+.ctrl .ok{color:var(--ok);border-color:var(--ok)}
+.ctrl .no{color:var(--no);border-color:var(--no)}
+.ctrl .undo{font-size:30px}
+.hint{text-align:center;color:var(--mute);margin-top:8px;min-height:22px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);max-width:420px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#000;border-radius:6px}
+dialog .f{display:grid;gap:8px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>圖卡記憶</h1>
+  <span id="saveMsg"></span><button id="save" title="立即寫入本地儲存,並下載備份檔">手動儲存</button><button id="load" title="從備份檔還原資料">載入備份</button><input type="file" id="loadFile" accept=".json,application/json" hidden>
+  <button class="tab on" id="tEdit">編輯卡牌</button>
+  <button class="tab" id="tQuiz">開始測驗</button>
+</header>
+<main>
+<section id="vEdit" class="edit">
+  <div class="side">
+    <div class="row"><input type="text" id="newDeck" placeholder="新主題集名稱" style="flex:1;min-width:0"><button class="pri" id="addDeck">新增</button></div>
+    <div id="decks"></div>
+    <div class="row" style="margin-top:10px"><button class="dng" id="delDecks">刪除勾選的主題集</button></div>
+  </div>
+  <div class="cardsbox">
+    <div class="drop" id="drop">拖曳圖片到這裡,或 <button id="pick">批量選擇圖片</button><input type="file" id="file" accept="image/*" multiple hidden>
+      <div id="upmsg" class="mute"></div></div>
+    <div class="row">
+      <button id="selAll">全選</button><button id="selNone">取消全選</button>
+      <select id="moveTo"></select><button id="moveBtn">移動勾選卡片</button>
+      <button class="dng" id="delCards">刪除勾選卡片</button>
+      <span class="mute" id="cnt"></span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section id="vQuiz" class="hide">
+  <div class="setup" id="setup">
+    <h3 style="margin-top:0">選擇測驗範圍</h3>
+    <label><input type="checkbox" id="qAll" checked> 全部主題集(混合隨機)</label>
+    <div id="qDecks" style="padding-left:20px"></div>
+    <button class="pri" id="start" style="margin-top:10px">開始</button>
+    <div class="mute" id="qmsg" style="margin-top:8px"></div>
+  </div>
+  <div class="stage hide" id="stage">
+    <div class="info"><span id="prog"></span><button id="quit">結束測驗</button></div>
+    <div class="pic" id="pic"><img id="qimg" alt=""><div class="cover" id="cover"></div></div>
+    <div class="ctrl">
+      <button class="undo" id="undo" title="上一步">↶</button>
+      <button class="ok" id="ok" title="熟悉(不再出現)">○</button>
+      <button class="no" id="no" title="不熟悉(稍後再出現)">△</button>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+</section>
+</main>
+
+<dialog id="dlg">
+  <img id="dImg" alt="">
+  <div class="f">
+    <input type="text" id="dName" placeholder="卡片名稱">
+    <select id="dDeck"></select>
+    <div class="row" style="margin:0"><button id="dRep">更換圖片</button><input type="file" id="dFile" accept="image/*" hidden><span class="mute" id="dRepMsg"></span></div>
+  </div>
+  <div class="row" style="margin:12px 0 0;justify-content:flex-end">
+    <button class="dng" id="dDel" style="margin-right:auto">刪除</button><button id="dCancel">取消</button><button class="pri" id="dSave">儲存</button>
+  </div>
+</dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+let decks=[],cards=[],cur=null,selC=new Set(),selD=new Set(),db=null,mem=false;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---------- 儲存(IndexedDB,失敗時只存記憶體) ---------- */
+function openDB(){return new Promise(res=>{try{const r=indexedDB.open('flashcards',1);
+ r.onupgradeneeded=()=>{r.result.createObjectStore('decks',{keyPath:'id'});r.result.createObjectStore('cards',{keyPath:'id'})};
+ r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}})}
+const tx=(s,m,f)=>new Promise(res=>{if(!db)return res([]);try{const t=db.transaction(s,m),st=t.objectStore(s),q=f(st);
+ t.oncomplete=()=>res(q&&q.result);t.onerror=()=>res(null)}catch(e){res(null)}});
+const put=(s,o)=>tx(s,'readwrite',st=>st.put(o));
+const del=(s,id)=>tx(s,'readwrite',st=>st.delete(id));
+const all=s=>tx(s,'readonly',st=>st.getAll());
+
+/* ---------- 主題集排序 ---------- */
+async function saveOrder(){for(let i=0;i<decks.length;i++){decks[i].order=i;await put('decks',decks[i])}}
+
+/* ---------- 手動儲存 ---------- */
+let saveTimer=null;
+$('save').onclick=async()=>{
+  const b=$('save');b.disabled=true;
+  await saveOrder();
+  if(db){for(const c of cards)await put('cards',c)}
+  const data={version:1,savedAt:new Date().toISOString(),decks,cards};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
+  a.download='flashcards-backup-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  $('saveMsg').textContent=`已儲存 ${new Date().toLocaleTimeString()}(${decks.length} 主題集 / ${cards.length} 卡片)`;
+  clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('saveMsg').textContent='',5000);
+  b.disabled=false};
+
+/* ---------- 從備份檔載入 ---------- */
+const clr=s=>tx(s,'readwrite',st=>st.clear());
+$('load').onclick=()=>$('loadFile').click();
+$('loadFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  let data;
+  try{data=JSON.parse(await f.text())}catch(err){return alert('無法讀取:這不是有效的備份檔')}
+  if(!data||!Array.isArray(data.decks)||!Array.isArray(data.cards))return alert('備份檔格式不正確');
+  const nd=data.decks.filter(d=>d&&d.id&&typeof d.name==='string');
+  const ids=new Set(nd.map(d=>d.id));
+  const nc=data.cards.filter(c=>c&&c.id&&ids.has(c.deckId)&&typeof c.img==='string'&&typeof c.name==='string');
+  if(!nd.length)return alert('備份檔中沒有主題集');
+  if(!confirm(`將載入 ${nd.length} 個主題集、${nc.length} 張卡片。\n目前所有資料會被取代,確定嗎?`))return;
+  nd.sort((a,b)=>(a.order??1e9)-(b.order??1e9));
+  await clr('decks');await clr('cards');
+  decks=nd;cards=nc;
+  await saveOrder();
+  for(const c of cards)await put('cards',c);
+  selC.clear();selD.clear();cur=decks[0].id;
+  show('edit');
+  $('saveMsg').textContent=`已載入 ${decks.length} 主題集 / ${cards.length} 卡片`;
+  clearTimeout(saveTimer);saveTimer=setTimeout(()=>$('saveMsg').textContent='',5000)};
+
+/* ---------- 工具 ---------- */
+const readFile=f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)});
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const deckName=id=>(decks.find(d=>d.id===id)||{}).name||'';
+const deckOpts=(sel)=>decks.map(d=>`<option value="${d.id}" ${d.id===sel?'selected':''}>${esc(d.name)}</option>`).join('');
+
+/* ---------- 編輯頁 ---------- */
+function render(){
+  $('decks').innerHTML=`<div class="deck ${cur===null?'on':''}" data-id=""><span class="n">全部卡片</span><small>${cards.length}</small></div>`+
+   decks.map((d,i)=>`<div class="deck ${cur===d.id?'on':''}" data-id="${d.id}"><input type="checkbox" data-dc="${d.id}" ${selD.has(d.id)?'checked':''}><span class="n">${esc(d.name)}</span><small>${cards.filter(c=>c.deckId===d.id).length}</small><button class="mv" data-up="${d.id}" title="上移" ${i===0?'disabled':''}>▲</button><button class="mv" data-dn="${d.id}" title="下移" ${i===decks.length-1?'disabled':''}>▼</button><button data-rn="${d.id}">改名</button></div>`).join('');
+  const list=cards.filter(c=>cur===null||c.deckId===cur);
+  $('grid').innerHTML=list.map(c=>`<div class="c ${selC.has(c.id)?'sel':''}" data-id="${c.id}"><img src="${c.img}" alt="" loading="lazy"><div class="cap"><input type="checkbox" data-cc="${c.id}" ${selC.has(c.id)?'checked':''}><span title="${esc(c.name)}">${esc(c.name)}</span><button data-ed="${c.id}">編輯</button></div></div>`).join('')||'<p class="mute">這裡還沒有卡片。</p>';
+  $('cnt').textContent=`顯示 ${list.length} 張,已勾選 ${[...selC].filter(id=>list.some(c=>c.id===id)).length} 張`;
+  $('moveTo').innerHTML=deckOpts(cur);
+  $('pick').disabled=cur===null;
+  $('upmsg').textContent=cur===null?'請先在左側選一個主題集,再上傳圖片':`將上傳到「${deckName(cur)}」`;
+  if(mem)$('upmsg').textContent+='(此環境無法永久儲存,重新整理後資料會消失)';
+}
+$('decks').onclick=async e=>{
+  const dc=e.target.closest('[data-dc]');if(dc){dc.checked?selD.add(dc.dataset.dc):selD.delete(dc.dataset.dc);return}
+  const mv=e.target.closest('[data-up],[data-dn]');
+  if(mv){const id=mv.dataset.up||mv.dataset.dn,i=decks.findIndex(x=>x.id===id),j=mv.dataset.up?i-1:i+1;
+    if(i<0||j<0||j>=decks.length)return;
+    [decks[i],decks[j]]=[decks[j],decks[i]];await saveOrder();render();return}
+  const rn=e.target.closest('[data-rn]');
+  if(rn){const d=decks.find(x=>x.id===rn.dataset.rn),n=prompt('主題集名稱',d.name);if(n&&n.trim()){d.name=n.trim();await put('decks',d);render()}return}
+  const el=e.target.closest('.deck');if(el){cur=el.dataset.id||null;render()}};
+$('addDeck').onclick=async()=>{const n=$('newDeck').value.trim();if(!n)return;
+  const d={id:uid(),name:n,order:decks.length};decks.push(d);await put('decks',d);$('newDeck').value='';cur=d.id;render()};
+$('newDeck').onkeydown=e=>{if(e.key==='Enter')$('addDeck').click()};
+$('delDecks').onclick=async()=>{
+  if(!selD.size)return alert('請先勾選要刪除的主題集');
+  const n=cards.filter(c=>selD.has(c.deckId)).length;
+  if(!confirm(`刪除 ${selD.size} 個主題集,其中的 ${n} 張卡片也會一併刪除。確定嗎?`))return;
+  for(const c of cards.filter(c=>selD.has(c.deckId)))await del('cards',c.id);
+  for(const id of selD)await del('decks',id);
+  cards=cards.filter(c=>!selD.has(c.deckId));decks=decks.filter(d=>!selD.has(d.id));
+  if(selD.has(cur))cur=null;selD.clear();await saveOrder();render()};
+
+async function addFiles(files){
+  if(cur===null)return alert('請先選擇一個主題集');
+  const fs=[...files].filter(f=>f.type.startsWith('image/'));let i=0;
+  for(const f of fs){$('upmsg').textContent=`上傳中 ${++i}/${fs.length}…`;
+    const c={id:uid(),deckId:cur,name:f.name.replace(/\.[^.]+$/,''),img:await readFile(f)};
+    cards.push(c);await put('cards',c)}
+  render()}
+$('pick').onclick=()=>$('file').click();
+$('file').onchange=async e=>{await addFiles(e.target.files);e.target.value=''};
+$('drop').ondragover=e=>{e.preventDefault();$('drop').classList.add('over')};
+$('drop').ondragleave=()=>$('drop').classList.remove('over');
+$('drop').ondrop=e=>{e.preventDefault();$('drop').classList.remove('over');addFiles(e.dataTransfer.files)};
+
+$('grid').onclick=e=>{
+  const cc=e.target.closest('[data-cc]');
+  if(cc){cc.checked?selC.add(cc.dataset.cc):selC.delete(cc.dataset.cc);render();return}
+  const ed=e.target.closest('[data-ed]');if(ed)openDlg(ed.dataset.ed)};
+const visible=()=>cards.filter(c=>cur===null||c.deckId===cur);
+$('selAll').onclick=()=>{visible().forEach(c=>selC.add(c.id));render()};
+$('selNone').onclick=()=>{selC.clear();render()};
+$('delCards').onclick=async()=>{
+  if(!selC.size)return alert('請先勾選卡片');
+  if(!confirm(`刪除 ${selC.size} 張卡片?`))return;
+  for(const id of selC)await del('cards',id);
+  cards=cards.filter(c=>!selC.has(c.id));selC.clear();render()};
+$('moveBtn').onclick=async()=>{
+  if(!selC.size)return alert('請先勾選卡片');
+  const t=$('moveTo').value;
+  for(const c of cards.filter(c=>selC.has(c.id))){c.deckId=t;await put('cards',c)}
+  selC.clear();render()};
+
+/* 單張編輯 */
+let ed=null,newImg=null;
+function openDlg(id){ed=cards.find(c=>c.id===id);newImg=null;
+  $('dImg').src=ed.img;$('dName').value=ed.name;$('dDeck').innerHTML=deckOpts(ed.deckId);$('dRepMsg').textContent='';$('dlg').showModal()}
+$('dRep').onclick=()=>$('dFile').click();
+$('dFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;newImg=await readFile(f);$('dImg').src=newImg;$('dRepMsg').textContent='已選新圖,按儲存生效';e.target.value=''};
+$('dCancel').onclick=()=>$('dlg').close();
+$('dSave').onclick=async()=>{ed.name=$('dName').value.trim()||ed.name;ed.deckId=$('dDeck').value;if(newImg)ed.img=newImg;
+  await put('cards',ed);$('dlg').close();render()};
+$('dDel').onclick=async()=>{if(!confirm('刪除這張卡片?'))return;await del('cards',ed.id);cards=cards.filter(c=>c.id!==ed.id);selC.delete(ed.id);$('dlg').close();render()};
+
+/* ---------- 切換頁面 ---------- */
+function show(v){
+  $('vEdit').classList.toggle('hide',v!=='edit');$('vQuiz').classList.toggle('hide',v!=='quiz');
+  $('tEdit').classList.toggle('on',v==='edit');$('tQuiz').classList.toggle('on',v==='quiz');
+  if(v==='quiz')setupQuiz();else render()}
+$('tEdit').onclick=()=>show('edit');$('tQuiz').onclick=()=>show('quiz');
+
+/* ---------- 測驗 ---------- */
+let pool=[],now=null,hist=[],total=0,covered=true;
+function setupQuiz(){
+  $('setup').classList.remove('hide');$('stage').classList.add('hide');$('qmsg').textContent='';
+  $('qDecks').innerHTML=decks.map(d=>`<label><input type="checkbox" class="qd" value="${d.id}"> ${esc(d.name)} <span class="mute">(${cards.filter(c=>c.deckId===d.id).length})</span></label>`).join('');
+  $('qAll').checked=true;$('qDecks').style.opacity=.5}
+$('qAll').onchange=()=>{$('qDecks').style.opacity=$('qAll').checked?.5:1;if($('qAll').checked)document.querySelectorAll('.qd').forEach(x=>x.checked=false)};
+$('qDecks').onchange=e=>{if(e.target.classList.contains('qd')&&e.target.checked){$('qAll').checked=false;$('qDecks').style.opacity=1}
+  if(![...document.querySelectorAll('.qd')].some(x=>x.checked))$('qAll').checked=true,$('qDecks').style.opacity=.5};
+$('start').onclick=()=>{
+  const ids=$('qAll').checked?null:[...document.querySelectorAll('.qd:checked')].map(x=>x.value);
+  pool=cards.filter(c=>!ids||ids.includes(c.deckId)).map(c=>c.id);
+  if(!pool.length)return $('qmsg').textContent='選擇的範圍內沒有卡片。';
+  total=pool.length;hist=[];now=null;
+  $('setup').classList.add('hide');$('stage').classList.remove('hide');next()};
+function next(){
+  if(!pool.length){now=null;$('pic').classList.add('hide');document.querySelector('.ctrl').classList.add('hide');
+    $('hint').innerHTML=`🎉 全部熟悉了!共 ${total} 張。 <button class="pri" id="again">再測一次</button>`;
+    $('prog').textContent=`完成 ${total}/${total}`;$('again').onclick=()=>$('start').click();return}
+  const opts=pool.length>1?pool.filter(id=>id!==now):pool;
+  now=opts[Math.floor(Math.random()*opts.length)];showCard()}
+function showCard(){
+  $('pic').classList.remove('hide');document.querySelector('.ctrl').classList.remove('hide');
+  $('qimg').src=cards.find(c=>c.id===now).img;covered=true;sync()}
+function sync(){
+  $('cover').classList.toggle('hide',!covered);
+  $('ok').disabled=$('no').disabled=covered;
+  $('undo').disabled=!hist.length;
+  $('prog').textContent=`已熟悉 ${total-pool.length}/${total},剩餘 ${pool.length}`;
+  $('hint').textContent=covered?'先點選圖片移除黑色圖塊,才能作答':'再點一次圖片可重新蓋住'}
+$('pic').onclick=()=>{if(now){covered=!covered;sync()}};
+function answer(a){if(covered||!now)return;hist.push({id:now,a});if(a==='ok')pool=pool.filter(i=>i!==now);next()}
+$('ok').onclick=()=>answer('ok');$('no').onclick=()=>answer('no');
+$('undo').onclick=()=>{const h=hist.pop();if(!h)return;if(h.a==='ok')pool.push(h.id);now=h.id;showCard()};
+$('quit').onclick=setupQuiz;
+document.addEventListener('keydown',e=>{if($('vQuiz').classList.contains('hide')||$('stage').classList.contains('hide')||$('dlg').open)return;
+  if(e.key===' '){e.preventDefault();$('pic').click()}});
+
+/* ---------- 啟動 ---------- */
+(async()=>{
+  db=await openDB();mem=!db;
+  if(db){decks=(await all('decks'))||[];cards=(await all('cards'))||[];
+    decks=decks.map((d,i)=>({d,i})).sort((a,b)=>(a.d.order??1e9)-(b.d.order??1e9)||a.i-b.i).map(x=>x.d);
+    if(decks.some((d,i)=>d.order!==i))await saveOrder()}
+  if(!decks.length){const d={id:uid(),name:'預設主題集',order:0};decks.push(d);await put('decks',d)}
+  cur=decks[0].id;render()})();
+</script>
+</body>
+</html>
