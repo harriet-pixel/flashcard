@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>圖片遮罩測驗</title>
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#1c2740;--sub:#6b7690;--line:#d5dbe4;--pri:#2b4a8b;--ok:#0f766e;--no:#b45309;--danger:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#141a28;--card:#1d2536;--ink:#e6eaf3;--sub:#93a0bb;--line:#31405d;--pri:#7ea2f0;--ok:#2dd4bf;--no:#fbbf24;--danger:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:4px;padding:8px 12px;align-items:center}
+header b{margin-right:auto;font-size:16px}
+.tab{border:0;background:none;color:var(--sub);padding:8px 14px;border-radius:8px;font:inherit;cursor:pointer}
+.tab.on{background:var(--pri);color:#fff}
+main{max-width:860px;margin:0 auto;padding:16px}
+button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px}
+button:disabled{opacity:.35;cursor:not-allowed}
+button.p{background:var(--pri);border-color:var(--pri);color:#fff}
+button.d{color:var(--danger)}
+input[type=text]{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);min-width:0;flex:1}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.item{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+.item .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;font-weight:600}
+.item small{color:var(--sub)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.th{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.th .im{position:relative;aspect-ratio:4/3;background:#0001}
+.th img{width:100%;height:100%;object-fit:contain;display:block}
+.th .bar{display:flex;gap:4px;padding:6px;align-items:center}
+.th .bar span{flex:1;font-size:12px;color:var(--sub)}
+.empty{color:var(--sub);text-align:center;padding:36px 12px;border:1px dashed var(--line);border-radius:10px;margin-top:12px}
+h2{margin:4px 0 12px;font-size:18px}
+.note{color:var(--sub);font-size:13px;margin:6px 0}
+#status{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:13px;display:none;z-index:30;max-width:90vw}
+/* stage */
+.stage{position:relative;display:inline-block;max-width:100%;line-height:0;user-select:none;touch-action:none}
+.stage img{max-width:100%;max-height:62vh;display:block;-webkit-user-drag:none}
+.stage .mk{position:absolute;background:#000}
+.stage.hide .mk.q{display:none}
+.edit .mk{background:rgba(0,0,0,.55);outline:2px solid #ef4444;cursor:move}
+.edit .mk.sel{outline:3px solid #3b82f6;background:rgba(0,0,0,.4)}
+.mk .hd,.mk .xd{display:none;position:absolute;z-index:3}
+.mk.sel .hd{display:block;width:16px;height:16px;margin:-8px 0 0 -8px;background:#fff;border:2px solid #3b82f6;border-radius:50%}
+.mk.sel .xd{display:flex;right:-12px;top:-30px;width:26px;height:26px;align-items:center;justify-content:center;background:#ef4444;color:#fff;border-radius:50%;font:700 16px/1 sans-serif;cursor:pointer}
+.hd[data-h=nw]{left:0;top:0;cursor:nwse-resize}.hd[data-h=n]{left:50%;top:0;cursor:ns-resize}.hd[data-h=ne]{left:100%;top:0;cursor:nesw-resize}
+.hd[data-h=e]{left:100%;top:50%;cursor:ew-resize}.hd[data-h=se]{left:100%;top:100%;cursor:nwse-resize}.hd[data-h=s]{left:50%;top:100%;cursor:ns-resize}
+.hd[data-h=sw]{left:0;top:100%;cursor:nesw-resize}.hd[data-h=w]{left:0;top:50%;cursor:ew-resize}
+#quizStage{text-align:center}
+#quizStage .stage{cursor:default;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.qbar{position:sticky;bottom:0;display:flex;gap:10px;justify-content:center;padding:12px 0 8px;background:linear-gradient(transparent,var(--bg) 30%)}
+.qbar button{font-size:22px;min-width:76px;padding:8px 14px}
+.qbar .ok{color:var(--ok);border-color:var(--ok)}
+.qbar .no{color:var(--no);border-color:var(--no)}
+.modal{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
+.modal>div{background:var(--card);border-radius:12px;padding:14px;max-width:760px;width:100%;text-align:center}
+.modal .row{justify-content:center;margin:8px 0}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--pri)}
+label.ck{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;cursor:pointer}
+.mk.w{background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.edit .mk.w{background:rgba(255,255,255,.72)}
+.edit .mk.w.sel{background:rgba(255,255,255,.5)}
+.sw{min-width:44px;font-weight:700}.sw.on{outline:3px solid var(--pri);outline-offset:1px}
+.crop .mk{pointer-events:none;opacity:.8}
+.cdim{position:absolute;inset:0;background:rgba(0,0,0,.55);pointer-events:none}
+.cbox{position:absolute;border:2px solid #3b82f6;cursor:move;z-index:2}
+.cbox .hd{display:block;position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;background:#fff;border:2px solid #3b82f6;border-radius:50%}
+#quizStage .stage.all{cursor:pointer}.mk.q{cursor:pointer}
+.mk.q.gone{display:none}
+</style>
+</head>
+<body>
+<header><b>圖片遮罩測驗</b>
+<button class="tab on" data-tab="lib">主題集</button>
+<button class="tab" data-tab="quiz">測驗</button>
+<button class="tab" data-tab="bak">備份</button></header>
+<main id="app"></main>
+<div id="status"></div>
+<input type="file" id="fileImg" accept="image/*" multiple hidden>
+<input type="file" id="fileRep" accept="image/*" hidden>
+<input type="file" id="fileBak" accept=".json,application/json" hidden>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script>
+/* ---------- 資料與儲存(IndexedDB) ---------- */
+let db={sets:[]}, ui={tab:'lib',open:null}, ed=null;
+const $=s=>document.querySelector(s), app=$('#app');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('maskquiz',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function load(){try{const d=await idb();const v=await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get('db');q.onsuccess=()=>r(q.result);q.onerror=()=>r()});if(v&&v.sets)db=v}catch(e){}}
+let st;function save(){clearTimeout(st);st=setTimeout(async()=>{try{const d=await idb();d.transaction('kv','readwrite').objectStore('kv').put(db,'db')}catch(e){toast('儲存失敗,請先匯出備份')}},200)}
+let tt;function toast(m,keep){const s=$('#status');s.textContent=m;s.style.display='block';clearTimeout(tt);if(!keep)tt=setTimeout(()=>s.style.display='none',2500)}
+const dlg=(msg,def)=>new Promise(res=>{const o=document.createElement('div');o.className='modal';o.style.zIndex=40;const pr=def!==undefined;
+ o.innerHTML=`<div style="margin-top:20vh;max-width:360px"><p>${esc(msg)}</p>${pr?'<input type="text" id="dI" style="width:100%;margin-bottom:8px">':''}<div class="row"><button id="dN">取消</button><button class="p" id="dY">確定</button></div></div>`;
+ document.body.appendChild(o);const inp=o.querySelector('#dI'),f=v=>{o.remove();res(v)};
+ if(inp){inp.value=def;inp.focus();inp.select();inp.onkeydown=e=>{if(e.key==='Enter')f(inp.value)}}
+ o.querySelector('#dN').onclick=()=>f(pr?null:false);o.querySelector('#dY').onclick=()=>f(pr?inp.value:true)});
+const getSet=id=>db.sets.find(s=>s.id===id);
+
+/* ---------- 圖片處理與日文偵測 ---------- */
+const readFile=f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)});
+const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src});
+async function shrink(f){const i=await loadImg(await readFile(f));const k=Math.min(1,1600/Math.max(i.width,i.height));
+ const c=document.createElement('canvas');c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);
+ const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.88)}
+const JP=/[\u3040-\u30ff\u31f0-\u31ff\u3400-\u4dbf\u4e00-\u9fff\uff66-\uff9f々]/;
+let worker=null;
+async function detect(src){
+ if(!window.Tesseract){toast('無法載入 OCR(需要網路),請手動框選遮罩');return[]}
+ try{
+  if(!worker){toast('載入日文辨識模型…',1);worker=await Tesseract.createWorker('jpn+eng')}
+  toast('辨識日文中…',1);
+  const {data}=await worker.recognize(src);const im=await loadImg(src),W=im.width,H=im.height,out=[];
+  for(const w of data.words||[]){
+   if(!JP.test(w.text)||w.confidence<30)continue;
+   const b=w.bbox,px=4,py=3;
+   const x=Math.max(0,b.x0-px),y=Math.max(0,b.y0-py),x1=Math.min(W,b.x1+px),y1=Math.min(H,b.y1+py);
+   out.push([x/W,y/H,(x1-x)/W,(y1-y)/H])}
+  return out
+ }catch(e){toast('自動偵測失敗,請手動框選');return[]}
+}
+
+/* ---------- 頁面切換 ---------- */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ui.tab=b.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===b));render()});
+function render(){({lib:renderLib,quiz:renderQuizSetup,bak:renderBak})[ui.tab]()}
+
+/* ---------- 主題集管理 ---------- */
+function renderLib(){
+ const s=ui.open&&getSet(ui.open);
+ if(s)return renderSet(s);
+ ui.open=null;
+ app.innerHTML=`<h2>主題集</h2>
+ <div class="row"><input type="text" id="newName" placeholder="輸入主題集名稱"><button class="p" id="addSet">新增主題集</button></div>
+ ${db.sets.length?db.sets.map((s,i)=>`<div class="item" data-id="${s.id}">
+  <span class="nm" data-a="open">${esc(s.name)}</span><small>${s.images.length} 張</small>
+  <button data-a="up" ${i==0?'disabled':''}>↑</button><button data-a="down" ${i==db.sets.length-1?'disabled':''}>↓</button>
+  <button data-a="ren">改名</button><button class="d" data-a="del">刪除</button></div>`).join('')
+ :'<div class="empty">還沒有主題集。輸入名稱後按「新增主題集」開始。</div>'}`;
+ const add=()=>{const v=$('#newName').value.trim();if(!v)return;db.sets.push({id:uid(),name:v,images:[]});save();renderLib()};
+ $('#addSet').onclick=add;$('#newName').onkeydown=e=>{if(e.key==='Enter')add()};
+ app.querySelectorAll('.item').forEach(el=>el.onclick=async e=>{
+  const a=e.target.dataset.a;if(!a)return;const i=db.sets.findIndex(s=>s.id===el.dataset.id),s=db.sets[i];
+  if(a==='open'){ui.open=s.id;renderLib()}
+  else if(a==='up'||a==='down'){const j=a==='up'?i-1:i+1;[db.sets[i],db.sets[j]]=[db.sets[j],db.sets[i]];save();renderLib()}
+  else if(a==='ren'){const n=await dlg('新的主題集名稱',s.name);if(n&&n.trim()){s.name=n.trim();save();renderLib()}}
+  else if(a==='del'&&await dlg(`刪除「${s.name}」與其中 ${s.images.length} 張圖片?`)){db.sets.splice(i,1);save();renderLib()}})
+}
+function renderSet(s){
+ app.innerHTML=`<div class="row"><button id="back">← 返回</button><h2 style="margin:0;flex:1">${esc(s.name)}</h2>
+ <button class="p" id="upl">上傳圖片</button></div>
+ <label class="note"><input type="checkbox" id="auto" checked> 上傳時自動偵測日文並加上黑色圖塊(首次需下載辨識模型,約數 MB)</label>
+ ${s.images.length?`<div class="grid">${s.images.map(m=>`<div class="th" data-id="${m.id}"><div class="im"><img src="${m.src}"></div>
+  <div class="bar"><span>${m.masks.length} 個遮罩</span><button data-a="edit">編輯</button><button class="d" data-a="del">刪除</button></div></div>`).join('')}</div>`
+ :'<div class="empty">這個主題集還沒有圖片,按「上傳圖片」加入。</div>'}`;
+ $('#back').onclick=()=>{ui.open=null;renderLib()};
+ $('#upl').onclick=()=>$('#fileImg').click();
+ app.querySelectorAll('.th').forEach(el=>el.onclick=async e=>{
+  const a=e.target.dataset.a,i=s.images.findIndex(m=>m.id===el.dataset.id);if(!a)return;
+  if(a==='edit')openEditor(s,s.images[i]);
+  else if(await dlg('刪除這張圖片?')){s.images.splice(i,1);save();renderLib()}})
+}
+$('#fileImg').onchange=async e=>{
+ const s=getSet(ui.open),files=[...e.target.files];e.target.value='';if(!s)return;
+ const auto=$('#auto')?.checked;
+ for(let k=0;k<files.length;k++){
+  toast(`處理第 ${k+1}/${files.length} 張…`,1);
+  try{const src=await shrink(files[k]);const masks=auto?await detect(src):[];s.images.push({id:uid(),src,masks});save()}catch(err){toast('無法讀取 '+files[k].name)}
+ }
+ toast('上傳完成');renderLib()
+};
+
+/* ---------- 圖片編輯(遮罩) ---------- */
+function openEditor(s,m){ed={s,m,src:m.src,masks:m.masks.map(r=>r.slice()),sel:-1,color:0,crop:null};drawEditor()}
+const HS=['nw','n','ne','e','se','s','sw','w'];
+const mkE=(r,i)=>`<div class="mk${r[4]===1?' w':''}${i===ed.sel?' sel':''}" data-i="${i}" style="left:${r[0]*100}%;top:${r[1]*100}%;width:${r[2]*100}%;height:${r[3]*100}%">${HS.map(h=>`<i class="hd" data-h="${h}"></i>`).join('')}<i class="xd">×</i></div>`;
+function drawEditor(){
+ if(ed.crop)return drawCrop();
+ let el=$('#editor');if(!el){el=document.createElement('div');el.id='editor';el.className='modal';document.body.appendChild(el)}
+ el.innerHTML=`<div><div class="note">選好顏色後,在空白處拖曳 = 新增該顏色圖塊;點圖塊 = 選取(可改顏色),拖曳移動,拖白點調整大小,按紅色 × 刪除。數量不限。(目前 ${ed.masks.length} 個)</div>
+ <div class="stage edit" id="edStage"><img src="${ed.src}">${ed.masks.map(mkE).join('')}</div>
+ <div class="row"><span class="note">圖塊顏色</span><button class="sw${ed.color?'':' on'}" id="cB" style="background:#000;color:#fff">黑</button><button class="sw${ed.color?' on':''}" id="cW" style="background:#fff;color:#000">白</button><button id="eCrop">裁切圖片</button></div>
+ <div class="row"><button id="eDel" ${ed.sel<0?'disabled':''}>刪除選取的圖塊</button><button id="eDet">重新自動偵測</button><button id="eClr">清除全部</button><button id="eRep">更換圖片</button></div>
+ <div class="row"><button id="eCancel">取消</button><button class="p" id="eSave">儲存</button></div></div>`;
+ const st=$('#edStage'),MIN=.01;let d=null,tmp=null;
+ const cl=v=>Math.min(1,Math.max(0,v));
+ const syncColor=()=>{$('#cB').classList.toggle('on',!ed.color);$('#cW').classList.toggle('on',!!ed.color)};
+ const pos=e=>{const b=st.getBoundingClientRect();return[cl((e.clientX-b.left)/b.width),cl((e.clientY-b.top)/b.height)]};
+ st.onpointerdown=e=>{
+  const t=e.target,[x,y]=pos(e);
+  if(t.classList.contains('xd')){ed.masks.splice(ed.sel,1);ed.sel=-1;e.preventDefault();return drawEditor()}
+  const mEl=t.closest('.mk');
+  if(mEl){
+   ed.sel=+mEl.dataset.i;ed.color=ed.masks[ed.sel][4]===1?1:0;syncColor();st.querySelectorAll('.mk').forEach(n=>n.classList.toggle('sel',n===mEl));$('#eDel').disabled=false;
+   d={t:t.dataset.h?'rs':'mv',h:t.dataset.h,sx:x,sy:y,o:ed.masks[ed.sel].slice(),el:mEl}
+  }else{
+   ed.sel=-1;st.querySelectorAll('.mk').forEach(n=>n.classList.remove('sel'));$('#eDel').disabled=true;
+   tmp=document.createElement('div');tmp.className='mk';st.appendChild(tmp);d={t:'new',sx:x,sy:y,mv:false}
+  }
+  st.setPointerCapture(e.pointerId)};
+ st.onpointermove=e=>{
+  if(!d)return;const[x,y]=pos(e);
+  if(d.t==='new'){const r=rect(d.sx,d.sy,x,y);if(r[2]>.005||r[3]>.005)d.mv=true;place(tmp,r)}
+  else if(d.t==='mv'){const o=d.o,nx=Math.min(1-o[2],Math.max(0,o[0]+x-d.sx)),ny=Math.min(1-o[3],Math.max(0,o[1]+y-d.sy));
+   ed.masks[ed.sel]=[nx,ny,o[2],o[3],o[4]||0];d.el.style.left=nx*100+'%';d.el.style.top=ny*100+'%'}
+  else{let[l,t,r,b]=[d.o[0],d.o[1],d.o[0]+d.o[2],d.o[1]+d.o[3]];
+   if(d.h.includes('w'))l=Math.min(x,r-MIN);if(d.h.includes('e'))r=Math.max(x,l+MIN);
+   if(d.h.includes('n'))t=Math.min(y,b-MIN);if(d.h.includes('s'))b=Math.max(y,t+MIN);
+   ed.masks[ed.sel]=[l,t,r-l,b-t,d.o[4]||0];place(d.el,ed.masks[ed.sel])}};
+ st.onpointerup=e=>{
+  if(!d)return;const[x,y]=pos(e),k=d;d=null;
+  if(k.t==='new'){tmp.remove();tmp=null;
+   if(k.mv){const r=rect(k.sx,k.sy,x,y);if(r[2]>.008&&r[3]>.008){ed.masks.push([...r,ed.color]);ed.sel=ed.masks.length-1}}}
+  drawEditor()};
+ $('#eDel').onclick=()=>{if(ed.sel>=0){ed.masks.splice(ed.sel,1);ed.sel=-1;drawEditor()}};
+ const setCol=c=>{ed.color=c;if(ed.sel>=0)ed.masks[ed.sel][4]=c;drawEditor()};
+ $('#cB').onclick=()=>setCol(0);$('#cW').onclick=()=>setCol(1);
+ $('#eCrop').onclick=()=>{ed.crop=[.05,.05,.9,.9];ed.sel=-1;drawEditor()};
+ $('#eClr').onclick=()=>{ed.masks=[];ed.sel=-1;drawEditor()};
+ $('#eDet').onclick=async()=>{ed.masks=await detect(ed.src);ed.sel=-1;toast('偵測完成');drawEditor()};
+ $('#eRep').onclick=()=>$('#fileRep').click();
+ $('#eCancel').onclick=()=>{el.remove();ed=null};
+ $('#eSave').onclick=()=>{ed.m.src=ed.src;ed.m.masks=ed.masks;save();el.remove();ed=null;renderLib()}
+}
+/* ---------- 裁切 ---------- */
+function drawCrop(){
+ const el=$('#editor');
+ el.innerHTML=`<div><div class="note">拖曳白點調整裁切範圍,拖曳框內可移動,在框外拖曳可重新框選。套用後圖塊會跟著調整,超出範圍的部分會被移除。</div>
+ <div class="stage crop" id="crStage"><img src="${ed.src}">${ed.masks.map(r=>mk(r)).join('')}<div class="cdim"></div><div class="cbox">${HS.map(h=>`<i class="hd" data-h="${h}"></i>`).join('')}</div></div>
+ <div class="row"><button id="cFull">選取全圖</button></div>
+ <div class="row"><button id="cCancel">取消裁切</button><button class="p" id="cOk">套用裁切</button></div></div>`;
+ const st=$('#crStage'),box=st.querySelector('.cbox'),dim=st.querySelector('.cdim'),MIN=.03;let d=null;
+ const cl=v=>Math.min(1,Math.max(0,v));
+ const pos=e=>{const b=st.getBoundingClientRect();return[cl((e.clientX-b.left)/b.width),cl((e.clientY-b.top)/b.height)]};
+ const upd=()=>{place(box,ed.crop);const[x,y,w,h]=ed.crop,p=v=>v*100+'%';
+  dim.style.clipPath=`polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,${p(x)} ${p(y)},${p(x)} ${p(y+h)},${p(x+w)} ${p(y+h)},${p(x+w)} ${p(y)},${p(x)} ${p(y)})`};
+ upd();
+ st.onpointerdown=e=>{const t=e.target,[x,y]=pos(e);
+  if(t.dataset.h)d={t:'rs',h:t.dataset.h,o:ed.crop.slice()};
+  else if(t.closest('.cbox'))d={t:'mv',sx:x,sy:y,o:ed.crop.slice()};
+  else d={t:'new',sx:x,sy:y};
+  st.setPointerCapture(e.pointerId)};
+ st.onpointermove=e=>{if(!d)return;const[x,y]=pos(e);
+  if(d.t==='new'){const r=rect(d.sx,d.sy,x,y);if(r[2]>MIN&&r[3]>MIN)ed.crop=r}
+  else if(d.t==='mv'){const o=d.o;ed.crop=[Math.min(1-o[2],Math.max(0,o[0]+x-d.sx)),Math.min(1-o[3],Math.max(0,o[1]+y-d.sy)),o[2],o[3]]}
+  else{let[l,t,r,b]=[d.o[0],d.o[1],d.o[0]+d.o[2],d.o[1]+d.o[3]];
+   if(d.h.includes('w'))l=Math.min(x,r-MIN);if(d.h.includes('e'))r=Math.max(x,l+MIN);
+   if(d.h.includes('n'))t=Math.min(y,b-MIN);if(d.h.includes('s'))b=Math.max(y,t+MIN);
+   ed.crop=[l,t,r-l,b-t]}
+  upd()};
+ st.onpointerup=()=>{d=null};
+ $('#cFull').onclick=()=>{ed.crop=[0,0,1,1];upd()};
+ $('#cCancel').onclick=()=>{ed.crop=null;drawEditor()};
+ $('#cOk').onclick=applyCrop
+}
+async function applyCrop(){
+ const im=await loadImg(ed.src),W=im.width,H=im.height,[a,b,w,h]=ed.crop;
+ const sx=Math.round(a*W),sy=Math.round(b*H),sw=Math.max(1,Math.min(W-sx,Math.round(w*W))),sh=Math.max(1,Math.min(H-sy,Math.round(h*H)));
+ const c=document.createElement('canvas');c.width=sw;c.height=sh;c.getContext('2d').drawImage(im,sx,sy,sw,sh,0,0,sw,sh);
+ const cx=sx/W,cy=sy/H,cw=sw/W,ch=sh/H,out=[];
+ for(const m of ed.masks){const x0=Math.max(m[0],cx),y0=Math.max(m[1],cy),x1=Math.min(m[0]+m[2],cx+cw),y1=Math.min(m[1]+m[3],cy+ch);
+  if(x1-x0>.002&&y1-y0>.002)out.push([(x0-cx)/cw,(y0-cy)/ch,(x1-x0)/cw,(y1-y0)/ch,m[4]===1?1:0])}
+ ed.src=c.toDataURL('image/jpeg',.92);ed.masks=out;ed.crop=null;ed.sel=-1;toast('已裁切');drawEditor()}
+const rect=(a,b,c,d)=>[Math.min(a,c),Math.min(b,d),Math.abs(c-a),Math.abs(d-b)];
+const place=(el,r)=>{el.style.cssText=`left:${r[0]*100}%;top:${r[1]*100}%;width:${r[2]*100}%;height:${r[3]*100}%`};
+const mk=(r,c='',i=0)=>`<div class="mk ${c}${r[4]===1?' w':''}" data-i="${i}" style="left:${r[0]*100}%;top:${r[1]*100}%;width:${r[2]*100}%;height:${r[3]*100}%"></div>`;
+$('#fileRep').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!ed)return;
+ ed.src=await shrink(f);ed.masks=[];ed.sel=-1;ed.crop=null;if(await dlg('要對新圖片自動偵測日文嗎?'))ed.masks=await detect(ed.src);drawEditor()};
+
+/* ---------- 測驗 ---------- */
+let Q=null;
+function renderQuizSetup(){
+ if(Q&&Q.active)return renderQuiz();
+ const n=s=>s.images.length;
+ app.innerHTML=`<h2>開始測驗</h2>
+ <label class="ck"><input type="radio" name="mode" value="all" checked> 全部主題集亂數(共 ${db.sets.reduce((a,s)=>a+n(s),0)} 張)</label>
+ <label class="ck"><input type="radio" name="mode" value="sel"> 選擇主題集亂數</label>
+ <div id="pick" style="display:none">${db.sets.map(s=>`<label class="ck" style="margin-left:24px"><input type="checkbox" class="sc" value="${s.id}"> ${esc(s.name)} <small>(${n(s)} 張)</small></label>`).join('')||'<div class="note">尚無主題集</div>'}</div>
+ <h2 style="margin-top:18px;font-size:16px">點擊圖片時</h2>
+ <label class="ck"><input type="radio" name="rev" value="all" ${(db.pref||{}).reveal==='one'?'':'checked'}> 全部圖塊一起消失(再點一次恢復)</label>
+ <label class="ck"><input type="radio" name="rev" value="one" ${(db.pref||{}).reveal==='one'?'checked':''}> 只有點選到的圖塊消失</label>
+ <div class="row" style="margin-top:14px"><button class="p" id="go">開始測驗</button></div>
+ <p class="note">○(會了,本次不再出現)與 △(再練習,稍後會再出現)隨時都可以按。</p>`;
+ document.querySelectorAll('[name=mode]').forEach(r=>r.onchange=()=>$('#pick').style.display=r.value==='sel'&&r.checked?'block':'none');
+ $('#go').onclick=()=>{
+  const sel=document.querySelector('[name=mode]:checked').value==='sel';
+  const ids=sel?[...document.querySelectorAll('.sc:checked')].map(c=>c.value):db.sets.map(s=>s.id);
+  const list=db.sets.filter(s=>ids.includes(s.id)).flatMap(s=>s.images);
+  if(!list.length)return toast(sel?'請先勾選含有圖片的主題集':'還沒有任何圖片');
+  const q=list.slice();for(let i=q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[q[i],q[j]]=[q[j],q[i]]}
+  const rv=document.querySelector('[name=rev]:checked').value;db.pref={reveal:rv};save();
+  Q={active:true,queue:q,total:q.length,done:0,hist:[],hidden:false,hid:[],reveal:rv};renderQuiz()}
+}
+function renderQuiz(){
+ if(!Q.queue.length){app.innerHTML=`<div class="empty"><h2>測驗完成</h2>共 ${Q.total} 題,全部都按了 ○。<div class="row" style="justify-content:center;margin-top:14px">
+  <button id="undo2" ${Q.hist.length?'':'disabled'}>復原</button><button class="p" id="again">回到設定</button></div></div>`;
+  $('#again').onclick=()=>{Q=null;renderQuizSetup()};$('#undo2').onclick=undo;return}
+ const m=Q.queue[0],all=Q.reveal==='all',left=m.masks.length-Q.hid.length;
+ app.innerHTML=`<div class="row"><span class="note" style="flex:1">已完成 ${Q.done}/${Q.total}・剩餘 ${Q.queue.length} 題</span><button id="quit">結束</button></div>
+ <div class="prog"><i style="width:${Q.done/Q.total*100}%"></i></div>
+ <div id="quizStage"><div class="stage ${all?'all':''} ${all&&Q.hidden?'hide':''}" id="qs"><img src="${m.src}">${m.masks.map((r,i)=>mk(r,'q'+(Q.hid.includes(i)?' gone':''),i)).join('')}</div></div>
+ <div class="note" style="text-align:center">${all?(Q.hidden?'圖塊已隱藏,再點一次可恢復':'點圖片隱藏全部圖塊'):(m.masks.length?`點選圖塊使其消失(尚餘 ${left} 個)`:'這張圖片沒有圖塊')}</div>
+ <div class="qbar"><button id="undo" ${Q.hist.length?'':'disabled'}>復原</button>
+ <button class="ok" id="ok">○</button><button class="no" id="no">△</button>${all?'':`<button id="rst" ${Q.hid.length?'':'disabled'}>重蓋</button>`}</div>`;
+ $('#qs').onclick=e=>{
+  if(all){Q.hidden=!Q.hidden;return renderQuiz()}
+  const t=e.target.closest('.mk.q');if(!t)return;
+  const i=+t.dataset.i;if(!Q.hid.includes(i))Q.hid.push(i);renderQuiz()};
+ if($('#rst'))$('#rst').onclick=()=>{Q.hid=[];renderQuiz()};
+ $('#ok').onclick=()=>step('ok');$('#no').onclick=()=>step('no');$('#undo').onclick=undo;
+ $('#quit').onclick=async()=>{if(await dlg('結束本次測驗?')){Q=null;renderQuizSetup()}}
+}
+function step(t){
+ Q.hist.push({queue:Q.queue.slice(),done:Q.done});
+ const m=Q.queue.shift();if(t==='ok')Q.done++;else Q.queue.push(m);
+ Q.hidden=false;Q.hid=[];renderQuiz()}
+function undo(){const h=Q.hist.pop();if(!h)return;Q.queue=h.queue;Q.done=h.done;Q.hidden=false;Q.hid=[];renderQuiz()}
+
+/* ---------- 備份 ---------- */
+function renderBak(){
+ const cnt=db.sets.reduce((a,s)=>a+s.images.length,0);
+ app.innerHTML=`<h2>備份與還原</h2>
+ <p class="note">資料存放在這個瀏覽器中。清除瀏覽器資料或換裝置前,請先下載備份檔。目前:${db.sets.length} 個主題集、${cnt} 張圖片。</p>
+ <div class="row"><button class="p" id="exp">下載備份檔(.json)</button><button id="imp">上傳備份檔還原</button></div>
+ <p class="note">若按下載後沒有反應(部分預覽環境會擋下載),可改用 <button id="cp">顯示備份內容並複製</button>,貼到文字檔存成 .json 即可。</p>
+ <p class="note">還原會以備份檔內容取代目前所有資料。</p>`;
+ const txt=()=>JSON.stringify({v:1,sets:db.sets});
+ $('#exp').onclick=()=>{try{const b=new Blob([txt()],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='quiz-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('已觸發下載;若沒有檔案,請用下方「顯示備份內容並複製」')}catch(e){toast('下載失敗,請用「顯示備份內容並複製」')}};
+ $('#cp').onclick=()=>{const o=document.createElement('div');o.className='modal';o.style.zIndex=40;
+  o.innerHTML=`<div><div class="note">備份內容(請全選複製,貼到文字檔並存成 .json)</div><textarea id="bt" readonly style="width:100%;height:50vh;font:12px monospace;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px"></textarea><div class="row"><button class="p" id="bc">複製</button><button id="bx">關閉</button></div></div>`;
+  document.body.appendChild(o);const t=o.querySelector('#bt');t.value=txt();t.select();
+  o.querySelector('#bx').onclick=()=>o.remove();
+  o.querySelector('#bc').onclick=async()=>{t.select();let ok=false;try{await navigator.clipboard.writeText(t.value);ok=true}catch(e){try{ok=document.execCommand('copy')}catch(e2){}}toast(ok?'已複製':'請手動複製選取的文字')}};
+ $('#imp').onclick=()=>$('#fileBak').click()
+}
+$('#fileBak').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{const d=JSON.parse(await f.text());
+  if(!Array.isArray(d.sets)||d.sets.some(s=>!s.name||!Array.isArray(s.images)))throw 0;
+  if(!await dlg(`備份檔含 ${d.sets.length} 個主題集。還原後會取代目前所有資料,確定嗎?`))return;
+  db={sets:d.sets.map(s=>({id:s.id||uid(),name:s.name,images:s.images.map(m=>({id:m.id||uid(),src:m.src,masks:m.masks||[]}))}))};
+  save();Q=null;ui.open=null;toast('還原完成');render()
+ }catch(err){toast('備份檔格式不正確')}};
+
+load().then(render);
+</script>
+</body>
+</html>
