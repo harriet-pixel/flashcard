@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>生成式AI教學闖關</title>
+<style>
+:root{box-sizing:border-box;--bg:#eef6f3;--ink:#1d3b34;--card:#fff;--line:#bcd8cf;--main:#1f7a63;--ok:#2e9e5b;--bad:#d4553f;--gold:#e8a317;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13211d;--ink:#e3f1ec;--card:#1c2f29;--line:#355a4f;--main:#4cc2a0;--ok:#4cc27d;--bad:#ef7a64;--gold:#f2b84b}}
+:root[data-theme="dark"]{--bg:#13211d;--ink:#e3f1ec;--card:#1c2f29;--line:#355a4f;--main:#4cc2a0;--ok:#4cc27d;--bad:#ef7a64;--gold:#f2b84b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.7}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.6rem;margin:8px 0}
+.bar{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:10px}
+.track{display:flex;gap:6px;margin-bottom:16px}
+.track i{flex:1;height:10px;border-radius:5px;background:var(--line)}
+.track i.on{background:var(--main)}.track i.done{background:var(--ok)}.track i.miss{background:var(--bad)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:18px}
+.tag{display:inline-block;background:var(--main);color:#fff;border-radius:8px;padding:2px 10px;font-size:.85rem;margin-bottom:8px}
+.q{font-size:1.05rem;margin:0 0 14px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--main)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 18%,var(--card));animation:shake .3s}
+.opt:disabled{cursor:default}
+.exp{margin-top:12px;padding:12px 14px;border-left:5px solid var(--main);background:var(--bg);border-radius:8px;font-size:.95rem}
+.btn{font:inherit;font-weight:700;background:var(--main);color:#fff;border:0;border-radius:12px;padding:12px 22px;cursor:pointer;margin-top:14px}
+.big{font-size:3rem;text-align:center;margin:8px 0}
+.hide{display:none}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.opt.bad{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>生成式AI教學闖關</h1>
+<div class="bar"><span id="lv"></span><span id="sc"></span></div>
+<div class="track" id="track"></div>
+<section class="card" id="stage"></section>
+</main>
+<script>
+const Q=[
+{t:"適齡與安全",q:"李老師想在國小四年級的自然課導入生成式AI輔助學生解決問題。依據《數位教學指引3.0》，下列哪一種做法最符合國小階段的適齡適性與安全規範？",
+o:["給予學生極大的自主權，讓學生回家自行註冊一般市面上的生成式AI帳號來查詢自然科報告。","在課堂上由教師親自指導，引導學生使用教育部因材網的「教育生成式 AI-e度」進行提問與概念釐清。","鼓勵學生將真實姓名、班級與聯絡方式輸入給AI，以便AI能產出專屬個人的自然科考卷。","因為國小學生心智未成熟，應嚴格禁止他們接觸任何AI工具，以免產生學習依賴。"],a:1,
+e:"依據指引，13歲以下（國小階段）學生使用生成式AI時，必須在「教師指導下」進行，且建議選用專為教育目的設計的AI工具（如因材網、酷英網等），以確保內容合適並保護學生隱私。指引強調不應完全禁止，而是要教導學生安全、負責任地將AI作為學習夥伴，並避免輸入個人隱私資訊。"},
+{t:"風險與批判思辨",q:"國小六年級的小華利用AI工具幫忙蒐集「臺灣特有種生物」的專題報告資料。他發現AI提供了一種名為「臺灣高山藍色螢火蟲」的生物，但他從未在教科書或圖鑑上看過。此時，老師應該教導小華採取哪一種最正確的應對方式？",
+o:["相信AI擁有最龐大且先進的資料庫，直接將該生物資料複製貼上到專題報告中。","認為AI完全不可信，把整篇報告刪除，從此拒絕使用數位工具。","運用多方來源（如圖書館百科全書、自然科學博物館官方網站）進行交叉比對與事實查核，確認該生物是否真實存在。","直接詢問隔壁同學，只要同學說好像有聽過，就可以寫進報告裡。"],a:2,
+e:"生成式AI是基於機率生成的語言模型，容易產生「幻覺」，編造不存在的資訊，這就是AI的「事實性」與「正確性」風險。教師應教導學生「學習辨別與負責」，不能只是複製貼上，要利用多方可靠來源進行事實查核，並為自己採用的資料負責。"},
+{t:"教師專業與責任",q:"王老師在準備國小五年級的數學「分數的加減」單元時，請生成式AI設計了一份包含5題應用題的課後學習單。依據指引，王老師在將學習單發放給學生之前，必須落實下列哪一項核心守則？",
+o:["直接發放給學生，若題目有錯，則將出題責任完全交由AI系統承擔。","在學習單上加上浮水印，警告學生這是AI出的題目，禁止他們用AI解題。","以自身的數學學科知識及教學專業（AIPACK），審閱題目的邏輯正確性與國小五年級的程度適宜性，並為最終發放的教材負責。","刻意請AI將題目難度提升到國中程度，以防止小學生利用AI輕易查出答案。"],a:2,
+e:"指引明訂教師使用生成式AI的首要注意事項為「教師教學專業優先」及「為採用的內容負責」。教師必須運用自身的學科與教學專業知識（AIPACK）評估AI產生的資料，確認內容正確且符合學生的年齡與認知發展，不能將教育責任外包給AI。"}
+];
+const L="ABCD";let i=0,score=0,res=[];
+const $=id=>document.getElementById(id);
+function bar(){$("lv").textContent=i<Q.length?`第 ${i+1} 關 / ${Q.length}`:"闖關結束";$("sc").textContent=`答對 ${score} 題`;
+$("track").innerHTML=Q.map((_,k)=>`<i class="${k<res.length?(res[k]?'done':'miss'):k===i?'on':''}"></i>`).join("")}
+function show(){bar();const d=Q[i];
+$("stage").innerHTML=`<span class="tag">${d.t}</span><p class="q">${d.q}</p>`+d.o.map((x,k)=>`<button class="opt" data-k="${k}">（${L[k]}）${x}</button>`).join("")+`<div id="fb"></div>`;
+document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(+b.dataset.k))}
+function pick(k){const d=Q[i],ok=k===d.a;res.push(ok);if(ok)score++;
+document.querySelectorAll(".opt").forEach((b,j)=>{b.disabled=true;if(j===d.a)b.classList.add("ok");else if(j===k)b.classList.add("bad")});
+bar();
+$("fb").innerHTML=`<div class="exp"><b>${ok?"答對了！":"再想想，正確答案是（"+L[d.a]+"）。"}</b><br>${d.e}</div><button class="btn" id="nx">${i<Q.length-1?"下一關":"看結果"}</button>`;
+$("nx").focus();$("nx").onclick=()=>{i++;i<Q.length?show():end()}}
+function end(){bar();const m=score===3?["🏆","AI教學達人！三關全過。"]:score===2?["🌟","很不錯，再複習一下錯的那題。"]:["📘","再讀一次指引重點，然後重新挑戰。"];
+$("stage").innerHTML=`<div class="big">${m[0]}</div><p style="text-align:center;font-size:1.2rem"><b>${score} / ${Q.length} 題答對</b><br>${m[1]}</p><div style="text-align:center"><button class="btn" id="re">重新挑戰</button></div>`;
+$("re").onclick=()=>{i=0;score=0;res=[];show()}}
+show();
+</script>
+</body>
+</html>
