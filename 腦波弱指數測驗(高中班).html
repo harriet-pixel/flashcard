@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>腦波弱指數測驗</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#0e1424;--sub:#5d6680;--line:#dfe4ee;--a1:#6366f1;--a2:#ec4899;--glow:rgba(236,72,153,.16);--grad:linear-gradient(100deg,#6366f1,#ec4899 55%,#f59e0b);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070a12;--card:#10162a;--ink:#e8ecf8;--sub:#8a93b0;--line:#222b47;--a1:#818cf8;--a2:#f472b6;--glow:rgba(244,114,182,.2);--grad:linear-gradient(100deg,#818cf8,#f472b6 55%,#fbbf24)}}
+:root[data-theme="dark"]{--bg:#070a12;--card:#10162a;--ink:#e8ecf8;--sub:#8a93b0;--line:#222b47;--a1:#818cf8;--a2:#f472b6;--glow:rgba(244,114,182,.2);--grad:linear-gradient(100deg,#818cf8,#f472b6 55%,#fbbf24)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.6;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:36px 36px;background-position:-1px -1px}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 10% 0,rgba(236,72,153,.24),transparent 45%),radial-gradient(circle at 95% 25%,rgba(99,102,241,.24),transparent 45%),radial-gradient(circle at 20% 85%,rgba(16,185,129,.18),transparent 45%),linear-gradient(transparent 50%,var(--bg) 98%);pointer-events:none}
+main{position:relative;max-width:480px;margin:0 auto;padding:20px 18px 40px;min-height:100vh;display:flex;flex-direction:column}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.08em}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--sub);padding:6px 0 18px}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a1);margin-right:8px;box-shadow:0 0 8px var(--a1);animation:p 2s infinite}
+@keyframes p{50%{opacity:.3}}
+.screen{display:none;flex:1;flex-direction:column;animation:in .35s ease}
+.screen.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-size:34px;line-height:1.2;margin:8px 0 14px;font-weight:700;letter-spacing:-.01em}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+p.lead{color:var(--sub);font-size:15px;margin:0 0 22px}
+.wave{width:100%;height:90px;margin:6px 0 20px}
+.wave path{fill:none;stroke:url(#g);stroke-width:2;stroke-linecap:round;stroke-dasharray:6 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.chips span{font-size:12px;font-weight:600;border:1px solid var(--c);background:var(--card);color:var(--c);padding:5px 12px;border-radius:99px}
+.chips span:nth-child(1){--c:#ec4899}.chips span:nth-child(2){--c:#3b82f6}.chips span:nth-child(3){--c:#10b981}
+.btn{appearance:none;border:0;cursor:pointer;width:100%;padding:16px;border-radius:14px;font:600 16px inherit;font-family:inherit;color:#fff;background:var(--grad);box-shadow:0 10px 28px -8px var(--a2);transition:transform .15s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none;margin-top:10px}
+.spacer{flex:1}
+.prog{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.prog i{display:block;height:100%;width:0;background:var(--grad);transition:width .4s ease;box-shadow:0 0 10px var(--a2)}
+.qmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:22px}
+.qtag{display:inline-block;font-size:12px;color:var(--a1);border:1px solid var(--a1);border-radius:6px;padding:1px 8px;margin-bottom:12px}
+h2{font-size:21px;line-height:1.45;margin:0 0 22px;font-weight:600}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{appearance:none;text-align:left;font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:all .15s}
+.opt b{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--a1);border:1px solid var(--line);font-family:ui-monospace,Menlo,monospace}
+.opt:active,.opt.sel{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 25%,transparent);transform:scale(.99)}
+.opt:nth-child(1){--c:#ec4899}.opt:nth-child(2){--c:#3b82f6}.opt:nth-child(3){--c:#f59e0b}.opt:nth-child(4){--c:#10b981}
+.opt b{color:var(--c);border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
+.opt.sel b{background:var(--c);color:#fff}
+.back{background:none;border:0;color:var(--sub);font:inherit;font-size:13px;padding:14px 0 0;cursor:pointer;align-self:flex-start}
+.back[hidden]{visibility:hidden;display:block}
+.rcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 20px;position:relative;overflow:hidden}
+.rcard{border-top:4px solid var(--rc,var(--a1))}
+.rcard::before{content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(color-mix(in srgb,var(--rc,var(--a1)) 35%,transparent),transparent 70%)}
+.code{font-size:11px;color:var(--sub);margin-bottom:6px}
+.emoji{font-size:44px;line-height:1;margin:6px 0 10px}
+.rname{font-size:28px;font-weight:700;margin:0;line-height:1.25}
+.rsub{color:var(--rc,var(--a1));font-size:14px;font-weight:600;margin:4px 0 14px}
+.rdesc{font-size:15px;color:var(--sub);margin:0 0 16px}
+.tip{border-left:2px solid var(--a2);padding:4px 0 4px 12px;font-size:14px;margin:0 0 14px}
+.tip small{display:block;color:var(--a2);font-size:11px;margin-bottom:2px}
+.sec{margin:22px 0 10px;font-size:11px;color:var(--sub)}
+.bar{display:grid;grid-template-columns:92px 1fr 34px;gap:10px;align-items:center;font-size:13px;margin-bottom:10px}
+.bar .t{height:6px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .t i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--a1),var(--a2));transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar em{font-style:normal;text-align:right;color:var(--sub);font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.closing{text-align:center;font-size:13px;color:var(--sub);margin:20px 0 4px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:13px;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top mono"><span><i class="dot"></i>BRAINWAVE.SCAN</span><span id="clock">v1.0</span></div>
+
+  <section class="screen on" id="s-intro">
+    <h1>你的<span class="grad">腦波弱指數</span><br>有多高？</h1>
+    <p class="lead">7 個日常小情境，不分對錯。看看面對誘惑與軟弱時，你是哪一種行為類型。</p>
+    <svg class="wave" viewBox="0 0 400 90" preserveAspectRatio="none"><defs><linearGradient id="g"><stop offset="0" stop-color="#6366f1"/><stop offset=".5" stop-color="#ec4899"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><path id="wp" d="M0 45"/></svg>
+    <div class="chips"><span>7 題</span><span>約 1 分鐘</span><span>4 種類型</span></div>
+    <div class="spacer"></div>
+    <button class="btn" id="start">開始掃描</button>
+  </section>
+
+  <section class="screen" id="s-quiz">
+    <div class="prog"><i id="pb"></i></div>
+    <div class="qmeta mono"><span id="qn">01 / 07</span><span>SELECT ONE</span></div>
+    <span class="qtag" id="qt"></span>
+    <h2 id="qq"></h2>
+    <div class="opts" id="opts"></div>
+    <div class="spacer"></div>
+    <button class="back" id="back">← 上一題</button>
+  </section>
+
+  <section class="screen" id="s-result">
+    <div class="rcard">
+      <div class="code mono" id="rcode"></div>
+      <div class="emoji" id="remoji"></div>
+      <h2 class="rname" id="rname"></h2>
+      <div class="rsub" id="rsub"></div>
+      <p class="rdesc" id="rdesc"></p>
+      <div class="tip"><small class="mono">TIP</small><span id="rtip"></span></div>
+    </div>
+    <div class="sec mono">TYPE DISTRIBUTION</div>
+    <div id="bars"></div>
+    <p class="closing">人有軟弱，但不代表沒有盼望。</p>
+    <button class="btn" id="share">分享我的結果</button>
+    <button class="btn ghost" id="again">重新測驗</button>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+var T={
+ M:{c:"#ec4899",n:"誘惑磁鐵型",s:"容易被當下吸引",e:"🧲",d:"當下的快樂太有吸引力，一不小心就把原本的計畫拋到腦後。你不是沒有目標，而是當下的誘惑常常比長遠的目標更有吸引力。",t:"與其只靠意志力，不如先把誘惑移開，替自己創造更容易成功的環境。"},
+ W:{c:"#3b82f6",n:"自律戰士型",s:"擅長堅持原則",e:"🛡️",d:"你很重視承諾，也願意為目標付出努力。但即使是自律的人，也會有疲累、失控或需要幫助的時候。",t:"真正的成熟不只是努力不犯錯，也包括承認自己的有限。"},
+ T:{c:"#f59e0b",n:"天使惡魔拔河型",s:"內心常常在掙扎",e:"⚖️",d:"你知道什麼比較好，也想做出正確的選擇，但有時候想法和行動就是對不上。這種「明明想做好，卻又做不到」的感覺，正是很多人都經歷過的掙扎。",t:"不要只停留在自責，試著找出自己最容易失守的時刻。"},
+ H:{c:"#10b981",n:"成長求助型",s:"願意面對自己的有限",e:"🌱",d:"你知道改變需要努力，也明白有些事情不是光靠硬撐就能解決。你願意尋找方法、接受支持，並在跌倒後重新開始。",t:"接受幫助不是軟弱，而是勇敢面對自己的真實狀態。"}
+};
+var Q=[
+ {g:"睡前的手機誘惑",q:"你已經決定今晚 11 點準時睡覺，但 10:55 突然看到朋友傳來一則超有趣的影片，你會？",o:[["只看一下，結果不知不覺看了半小時","M"],["看完這一支就放下手機，努力遵守約定","W"],["直接把手機放遠，避免自己破功","H"],["告訴自己明天再早睡，今天先開心就好","M"]]},
+ {g:"拖延症突然發作",q:"明天就要考試了，但你還有三章沒讀，這時候朋友揪你打遊戲，你會？",o:[["先玩一場，結果打到半夜","M"],["拒絕邀約，先完成讀書計畫","W"],["先讀 30 分鐘，再玩一小段時間","H"],["一邊讀書一邊偷看訊息，最後兩邊都沒做好","T"]]},
+ {g:"手搖飲的呼喚",q:"你才剛發誓這週要省錢，結果路過最愛的飲料店，剛好看到買一送一，你會？",o:[["買！都買一送一了，不買太可惜","M"],["想喝但忍住，繼續往前走","W"],["買一杯就好，至少沒有花兩杯的錢","T"],["先確認預算，真的負擔得起才買","H"]]},
+ {g:"情緒上頭的瞬間",q:"有人傳訊息惹你生氣，你很想立刻回嗆，你會？",o:[["直接開噴，氣勢不能輸","M"],["先冷靜一下，想好再回覆","W"],["打了一大串，刪掉又重打，最後還是忍不住傳出去","T"],["暫時不回，等情緒過了再處理","H"]]},
+ {g:"沒人發現的小捷徑",q:"考試時，你發現旁邊同學的答案就在眼前，而且老師好像沒注意到，你會？",o:[["偷看一下，反正沒人知道","M"],["不看，自己會多少就寫多少","W"],["很掙扎，但最後還是選擇自己作答","T"],["心裡想偷看，最後還是忍住了","T"]]},
+ {g:"又一次破功了",q:"你又做了那件自己明明答應過不再做的事，心裡很後悔，你會？",o:[["算了，我就是這種人，改不了","M"],["檢討原因，想辦法調整下一次的做法","H"],["很自責，發誓下次一定不會再犯","T"],["假裝沒事，先不要想這件事","M"]]},
+ {g:"靠自己真的夠嗎？",q:"當你發現自己一直改不掉某個壞習慣，明明很努力卻還是失敗，你最可能怎麼做？",o:[["更努力要求自己，相信只要夠自律就能解決","W"],["承認自己有限，尋求朋友、師長或其他人的幫助","H"],["覺得自己沒救了，乾脆放棄","M"],["一邊努力改變，一邊學習接受幫助，不再只靠自己硬撐","H"]]}
+];
+var $=function(i){return document.getElementById(i)},ans=[],cur=0,busy=false;
+function show(id){["s-intro","s-quiz","s-result"].forEach(function(s){$(s).classList.toggle("on",s===id)});window.scrollTo(0,0)}
+function pad(n){return n<10?"0"+n:""+n}
+function render(){
+  var q=Q[cur];$("pb").style.width=(cur/Q.length*100)+"%";
+  $("qn").textContent=pad(cur+1)+" / "+pad(Q.length);$("qt").textContent="Q"+(cur+1)+" · "+q.g;$("qq").textContent=q.q;
+  $("back").hidden=cur===0;
+  var h="";q.o.forEach(function(o,i){h+='<button class="opt'+(ans[cur]===i?" sel":"")+'" data-i="'+i+'"><b>'+"ABCD"[i]+'</b><span>'+o[0]+'</span></button>'});
+  $("opts").innerHTML=h;
+  var el=$("s-quiz");el.classList.remove("on");void el.offsetWidth;el.classList.add("on");
+}
+$("opts").addEventListener("click",function(e){
+  var b=e.target.closest(".opt");if(!b||busy)return;busy=true;
+  ans[cur]=+b.dataset.i;b.classList.add("sel");
+  setTimeout(function(){busy=false;if(cur<Q.length-1){cur++;render()}else{result()}},260);
+});
+$("back").onclick=function(){if(cur>0){cur--;render()}};
+$("start").onclick=function(){cur=0;ans=[];show("s-quiz");render()};
+$("again").onclick=function(){show("s-intro")};
+var shareText="";
+function result(){
+  var c={M:0,W:0,T:0,H:0};
+  ans.forEach(function(a,i){c[Q[i].o[a][1]]++});
+  var max=Math.max.apply(null,Object.values(c));
+  var tops=Object.keys(c).filter(function(k){return c[k]===max});
+  var name,sub,desc,tip,emoji;
+  if(tops.length===1){var t=T[tops[0]];name=t.n;sub=t.s;desc=t.d;tip=t.t;emoji=t.e}
+  else{
+    name=tops.map(function(k){return T[k].n.replace("型","")}).join(" × ")+"混合型";
+    sub="同時擁有"+tops.length+"種傾向";emoji=tops.map(function(k){return T[k].e}).join("");
+    desc=tops.map(function(k){return "【"+T[k].n+"】"+T[k].d}).join("\n\n");
+    tip=tops.map(function(k){return T[k].t}).join(" ");
+  }
+  $("rcode").textContent="RESULT // "+tops.join("+");$("remoji").textContent=emoji;$("rname").textContent=name;$("rsub").textContent=sub;
+  $("rdesc").style.whiteSpace="pre-line";$("rdesc").textContent=desc;$("rtip").textContent=tip;
+  var h="";["M","W","T","H"].forEach(function(k){var p=Math.round(c[k]/Q.length*100);
+    h+='<div class="bar"><span>'+T[k].n.replace("型","")+'</span><div class="t"><i data-w="'+p+'" style="background:'+T[k].c+'"></i></div><em>'+p+'%</em></div>'});
+  $("bars").innerHTML=h;$("pb").style.width="100%";
+  shareText="我的心理測驗結果是「"+name+"」："+sub+"。你也來測測看你的腦波弱指數！";
+  document.querySelector(".rcard").style.setProperty("--rc",T[tops[0]].c);show("s-result");
+  setTimeout(function(){document.querySelectorAll(".bar i").forEach(function(i){i.style.width=i.dataset.w+"%"})},80);
+}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on")},1800)}
+$("share").onclick=function(){
+  try{if(navigator.share){navigator.share({title:"腦波弱指數測驗",text:shareText}).catch(function(){});return}}catch(e){}
+  try{navigator.clipboard.writeText(shareText).then(function(){toast("已複製結果")},function(){toast("請長按截圖分享")})}catch(e){toast("請截圖分享")}
+};
+/* intro waveform */
+(function(){var p=$("wp"),t=0;function f(){var d="M0 45";for(var x=0;x<=400;x+=5){var a=Math.sin(x/38+t)*14*Math.sin(x/130+t/3)+Math.sin(x/11+t*2)*5*Math.sin(x/70);d+=" L"+x+" "+(45+a).toFixed(1)}p.setAttribute("d",d);t+=.04;requestAnimationFrame(f)}f()})();
+</script>
+</body>
+</html>
