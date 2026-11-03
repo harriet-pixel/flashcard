@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>神奇的光 ─ 教案分析</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4efe4;--card:#fbf8f0;--ink:#2b2724;--sub:#6b625a;--red:#b5362b;--indigo:#2f4a6b;--line:#d8cfbd;--pat:#e9e1cf;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1c1a;--card:#27241f;--ink:#ece5d6;--sub:#a99f90;--red:#e0675a;--indigo:#8fb0d6;--line:#443e35;--pat:#2a2723;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1e1c1a;--card:#27241f;--ink:#ece5d6;--sub:#a99f90;--red:#e0675a;--indigo:#8fb0d6;--line:#443e35;--pat:#2a2723;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Serif TC","Hiragino Mincho ProN","PMingLiU",serif;line-height:1.9;
+background-image:radial-gradient(circle at 50% 100%,transparent 55%,var(--pat) 56%,var(--pat) 58%,transparent 59%),radial-gradient(circle at 50% 100%,transparent 35%,var(--pat) 36%,var(--pat) 38%,transparent 39%);background-size:60px 30px}
+nav{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 12px;justify-content:center}
+nav a{color:var(--sub);text-decoration:none;font-size:14px;padding:4px 12px;white-space:nowrap;border-radius:2px}nav a:hover{color:var(--red)}
+header{text-align:center;padding:64px 20px 40px;position:relative}
+.sun{width:110px;height:110px;border-radius:50%;background:var(--red);margin:0 auto 24px;opacity:.9;box-shadow:0 0 0 10px color-mix(in srgb,var(--red) 15%,transparent)}
+h1{writing-mode:vertical-rl;margin:0 auto;font-size:clamp(34px,8vw,56px);font-weight:900;letter-spacing:.3em;height:7em;display:block}
+.sub{color:var(--sub);letter-spacing:.2em;margin-top:16px}
+.seal{display:inline-block;background:var(--red);color:#fff;padding:2px 8px;font-size:14px;border-radius:2px;margin-top:12px;letter-spacing:.1em}
+main{max-width:860px;margin:0 auto;padding:0 18px 60px}
+section{margin:56px 0}
+h2{font-size:24px;font-weight:600;border-left:4px solid var(--red);padding-left:12px;margin:0 0 20px;letter-spacing:.1em}
+h2 small{display:block;font-size:12px;color:var(--sub);font-weight:400;letter-spacing:.2em}
+.card{background:var(--card);border:1px solid var(--line);padding:18px 22px;margin-bottom:14px;box-shadow:3px 3px 0 var(--line)}
+.card h3{margin:0 0 6px;color:var(--indigo);font-size:17px}.card p{margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid .card{margin:0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tabs button,.btn{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);padding:6px 16px;cursor:pointer;border-radius:2px}
+.tabs button[aria-selected=true]{background:var(--indigo);color:var(--bg);border-color:var(--indigo)}
+.tabs button:hover,.btn:hover{border-color:var(--red)}
+.btn.red{background:var(--red);color:#fff;border-color:var(--red)}
+.lab{background:var(--card);border:1px solid var(--line);padding:14px}
+.lab svg{width:100%;height:auto;display:block}
+.ctl{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:10px;font-size:14px}
+input[type=range]{accent-color:var(--red)}
+input[type=text],textarea{width:100%;font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:8px;margin-bottom:10px}
+.who{color:var(--red);font-weight:600}
+.rich h4{margin:18px 0 6px;color:var(--indigo);font-size:16px;border-bottom:1px dashed var(--line);padding-bottom:4px}.rich p{margin:0 0 10px}.rich li{margin-bottom:10px}.rich b{color:var(--red);font-weight:600}.rich .eg{border-left:3px solid var(--line);padding-left:12px;color:var(--sub)}
+.grp{display:inline-block;background:var(--indigo);color:var(--bg);padding:2px 14px;margin-bottom:12px;letter-spacing:.2em}
+.note{color:var(--sub);font-size:14px}
+ul{padding-left:1.2em;margin:6px 0}
+footer{text-align:center;color:var(--sub);font-size:13px;padding:30px 20px 50px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<nav>
+<a href="#intro">教案簡介</a><a href="#flow">教學流程</a><a href="#lab">光線實驗</a><a href="#analysis">內容分析</a><a href="#reviews">分析心得</a><a href="#team">小組分工</a>
+</nav>
+<header>
+<div class="sun"></div>
+<h1>神奇的光</h1>
+<div class="sub">光的反射與直進 ・ 教案分析</div>
+<span class="seal">自然與生活科技</span>
+</header>
+<main>
+
+<section id="intro">
+<h2>一、教案簡介<small>INTRODUCTION</small></h2>
+<div class="card"><h3>教案名稱</h3><p>神奇的光－光的反射和直進</p></div>
+<div class="grid">
+<div class="card"><h3>學習領域</h3><p>自然與生活科技領域</p></div>
+<div class="card"><h3>學習對象</h3><p>國小四年級學生，班級共 26 人</p></div>
+<div class="card"><h3>學習內容</h3><p>INe-II-6 光線以直線前進，反射時有一定的方向</p></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>學習目標</h3><p>學生能透過觀察與討論，理解眼睛看到物體的科學原理：物體須發光或需光源照射、光線具備直進性，以及物體表面光線經反射或直接發光進入眼睛。</p></div>
+<div class="card"><h3>核心素養</h3>
+<ul>
+<li><b>自-E-A2</b>：運用好奇心與想像能力，提出探究問題或解釋資料，並理解科學事實會有不同的論點與證據。</li>
+<li><b>自-E-B2</b>：了解科技及媒體的運用方式，從學習活動、日常經驗或網路媒體中察覺問題並獲取探究資訊。</li>
+<li><b>自-E-C2</b>：透過探索科學的合作學習，培養同儕溝通表達、團隊合作及和諧相處的能力。</li>
+</ul></div>
+</section>
+
+<section id="flow">
+<h2>二、教學流程<small>5E INQUIRY MODEL</small></h2>
+<div class="tabs" role="tablist" id="tabs"></div>
+<div class="card" id="tabBody" aria-live="polite"></div>
+</section>
+
+<section id="lab">
+<h2>三、光之實驗室<small>INTERACTIVE</small></h2>
+<div class="lab">
+<svg viewBox="0 0 600 300" role="img" aria-label="光線反射示意圖">
+<line x1="120" y1="230" x2="480" y2="230" stroke="var(--indigo)" stroke-width="6"/>
+<line x1="300" y1="230" x2="300" y2="50" stroke="var(--sub)" stroke-dasharray="5 5"/>
+<g id="rays"></g>
+<circle id="src" r="14" fill="var(--red)"/>
+<text id="srcT" font-size="13" fill="var(--ink)">光源</text>
+<g id="eye"><ellipse rx="22" ry="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><circle r="6" fill="var(--indigo)"/></g>
+<text id="eyeT" font-size="13" fill="var(--ink)">眼睛</text>
+<text x="300" y="258" text-anchor="middle" font-size="13" fill="var(--sub)">鏡面</text>
+<text id="msg" x="300" y="282" text-anchor="middle" font-size="15" fill="var(--red)"></text>
+</svg>
+<div class="ctl">
+<label>入射角 <input type="range" id="ang" min="15" max="75" value="45"> <b id="angV">45°</b></label>
+<button class="btn red" id="pow">光源：開</button>
+</div>
+<p class="note">拖曳入射角，觀察反射角是否總與入射角相等；關掉光源，看看眼睛還看得到物體嗎？</p>
+</div>
+</section>
+
+<section id="analysis">
+<h2>四、教案內容分析<small>ANALYSIS</small></h2>
+<div class="card"><h3>（一）數位融入教學情形</h3><p>教案結合自主學習引導式探究模式，大量運用生成式 AI（e度、ChatGPT、Gemini）作為學生學習夥伴與教師備課助手。課堂亦利用 Padlet 平台展示小組想法，並以 PhET 進行視覺情境體驗。</p></div>
+<div class="card"><h3>（二）數位學習之優勢</h3><p>數位科技延伸學習場域並減少時空限制，讓學生可於課餘時間自主學習。生成式 AI 能即時解惑、提供解釋鷹架，線上平台則有效促進組內共學與組間互學之溝通協作。</p></div>
+<div class="card"><h3>（三）可改善之建議</h3><p>四年級學生易對「光線如何進入眼睛」產生直觀迷思，教師可增加日常生活中的多項實例進行驗證與討論；同時應持續提醒學生保持批判性思考，對 AI 產出內容進行事實查核，以落實 AI 素養規範。</p></div>
+</section>
+
+<section id="reviews">
+<h2>五、教案分析之心得<small>REFLECTIONS</small></h2>
+<div id="revList"></div>
+<div class="card">
+<h3>新增心得</h3>
+<input type="text" id="rName" placeholder="姓名" maxlength="20">
+<textarea id="rText" rows="4" placeholder="寫下你對本教案的分析心得…"></textarea>
+<button class="btn red" id="rAdd">寫下心得</button>
+<p class="note" style="margin-top:8px">心得僅儲存於此瀏覽器中。</p>
+</div>
+</section>
+
+<section id="team">
+<h2>六、小組分工名單<small>CREDITS</small></h2>
+<span class="grp">第 11 組</span>
+<div id="tmList"></div>
+<div class="card">
+<h3>新增分工</h3>
+<input type="text" id="tName" placeholder="組員姓名" maxlength="20">
+<input type="text" id="tTask" placeholder="負責工作（例如：教案簡介整理）" maxlength="60">
+<button class="btn red" id="tAdd">新增分工</button>
+<p class="note" style="margin-top:8px">分工僅儲存於此瀏覽器中。</p>
+</div>
+</section>
+</main>
+<footer>神奇的光 ・ 教案分析　｜　以和紙與朱色為意</footer>
+
+<script>
+const E=[
+["參與","Engagement","教師以關鍵提問引發學習興趣，並透過 PhET 互動式類比教材進行情境體驗與先備知識測驗。"],
+["探索","Exploration","小組討論眼睛看見物體的原理，並參考暗箱觀察裝置進行實驗設計，驗證光線與視覺的關係。"],
+["解釋","Explanation","學生進行個人解釋與組內討論，向因材網生成式 AI「e度」提問並驗證小組想法，產生科學解釋。"],
+["精緻化","Elaboration","各組上台發表論證結果並進行組間互評，教師再運用 ChatGPT 或 Gemini 進行概念釐清與回饋。"],
+["評量","Evaluation","透過因材網診斷測驗、討論區任務及 Kahoot! 即時評量，檢視學生對光線直進與反射概念的理解情形。"]];
+const tabs=document.getElementById('tabs'),body=document.getElementById('tabBody');
+function show(i){[...tabs.children].forEach((b,j)=>b.setAttribute('aria-selected',i===j));
+body.innerHTML='<h3>'+E[i][0]+' <span class="note">'+E[i][1]+'</span></h3><p>'+E[i][2]+'</p>'}
+E.forEach((e,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'・'+e[0];b.setAttribute('role','tab');b.onclick=()=>show(i);tabs.appendChild(b)});
+show(0);
+
+const $=id=>document.getElementById(id);let on=true;
+function draw(){
+const a=+$('ang').value,r=a*Math.PI/180,L=190,px=300,py=230;
+const sx=px-L*Math.sin(r),sy=py-L*Math.cos(r),ex=px+L*Math.sin(r),ey=py-L*Math.cos(r);
+$('angV').textContent=a+'°';
+$('src').setAttribute('cx',sx);$('src').setAttribute('cy',sy);$('src').style.opacity=on?1:.25;
+$('srcT').setAttribute('x',sx-14);$('srcT').setAttribute('y',sy-22);
+$('eye').setAttribute('transform','translate('+ex+','+ey+')');
+$('eyeT').setAttribute('x',ex-14);$('eyeT').setAttribute('y',ey-22);
+$('rays').innerHTML=on?'<polyline points="'+sx+','+sy+' '+px+','+py+' '+ex+','+ey+'" fill="none" stroke="var(--red)" stroke-width="3"/>':'';
+$('msg').textContent=on?'入射角 '+a+'° ＝ 反射角 '+a+'°　→ 眼睛看見了！':'沒有光，什麼也看不見';
+$('pow').textContent='光源：'+(on?'開':'關');}
+$('ang').oninput=draw;$('pow').onclick=()=>{on=!on;draw()};draw();
+
+const K='lightReviews2';let R=[
+{n:'張宇慧',h:`<p>這份教案在數位科技與科學探究的結合上相當完整，以下為針對其設計亮點、可修正之處以及所需先備知識的分析心得：</p><h4>一、教案設計的可取之處</h4><ul><li><b>融合5E探究與四學架構：</b>教案將5E探究模式（參與、探索、解釋、精緻化、評量）與自主學習的四學架構（學生自學、組內共學、組間互學、教師導學）緊密結合，學習脈絡清晰。</li><li><b>善用生成式AI作為學習夥伴：</b>巧妙導入因材網「e度」、ChatGPT與Gemini，不僅作為教師備課與生成情境測驗的助手，更作為引導學生釐清迷思、建立解釋鷹架的學習夥伴。</li><li><b>建立科學論證能力：</b>引導小組運用TAP論證模式（包含資料、宣稱、依據、支持、反駁、限制），讓學生在「競爭調和」與「詮釋整合」的過程中，培養具備科學依據的邏輯表達與思辨能力。</li><li><b>多元數位工具輔助：</b>整合PhET互動式類比教材進行情境體驗，並使用Padlet展示想法、Kahoot!進行即時評量，有效將抽象概念具體化並提升互動性。</li></ul><h4>二、可以修正與優化之處</h4><ul><li><b>增設AI事實查核的具體鷹架：</b>教案依循AI素養的「黃燈規範（可使用但需查核）」。然而，考量四年級學生對資訊真偽的判斷力尚在發展，教案可進一步明確規劃「如何驗證AI答案正確性」的檢核步驟或檢核表，避免學生過度依賴或直接抄寫AI生成的解釋。</li></ul><h4>三、學生需要的先備知識與能力</h4><ul><li><b>學科先備知識：</b>需具備低年級的影子單元概念，了解「用手電筒照射物體，物體會遮住光線形成影子」。</li><li><b>數位操作能力：</b>學生需熟悉因材網平台的操作使用，並能善用線上討論區（如因材網討論區、Padlet平台）進行小組分工、討論與資料統整。</li></ul>`},
+{n:'蘇綵婕',t:'本教案將生成式 AI 融入國小自然探究教學，不僅停留在工具的使用，而是將 AI（因材網e度、ChatGPT、Gemini）定位為學生的學習夥伴與教師的教學助手。透過 5E 探究、TAP 論證與四學架構的結合，提升學生的科學探究興趣、批判思考能力與數位素養，讓複雜的概念學習變得生動且具體。'},
+{n:'陳枻安',h:`<h4>三個優點</h4><ol><li><b>從生活經驗出發，讓抽象的光路變得容易理解</b><br>我覺得這份教案最容易引起學生興趣的地方，是用「為什麼關燈後看不清桌上的書，卻還看得見亮著的螢幕？」來開啟探究。學生可以先根據生活經驗猜想，再透過暗箱比較書本未受照、書本受照和螢幕亮著三種情況。這樣的安排能讓學生親自找出差異，進一步理解書本反射外來的光，而發亮的螢幕能提供進入眼睛的光。</li><li><b>運用 AI 提問，讓學生有機會重新檢查自己的想法</b><br>我認為因材網 e 度最有價值的用法，是在學生先畫出光路、說出理由後，再協助他們追問。例如，當學生認為「眼睛會發光照到書本」時，可以請 e 度提出一個能用暗箱檢查的問題，再用觀察結果回頭修正箭頭。這樣的過程讓學生練習把 AI 的回覆轉成可驗證的想法，也能具體說明自己為什麼改變看法。</li><li><b>透過小組分享與互評，讓科學解釋更有依據</b><br>我欣賞教案安排學生先個別思考，再進行組內討論與組間分享。當各組需要說明「我們的主張是什麼」「觀察到了什麼」「這個結果如何支持主張」時，其他組就能針對理由提出問題。例如，同儕可以追問「你們怎麼知道看到的是螢幕發出的光？」這類對話讓學生有機會補充證據，也讓教師看見他們理解到哪一步。</li></ol><h4>一個可以加強的地方</h4><p><b>把 AI 查核的過程做成一張簡短的修訂紀錄。</b><br>原教案已提醒學生驗證 e 度的回覆。我認為可以再往前一步，讓每組記下四項內容：<b>原本的想法、AI 的一則建議、用來核對的實驗觀察，以及最後修正了什麼</b>。例如，學生可以寫：</p><p class=eg>「我原本把箭頭從眼睛畫向書本。暗箱裡的書在手電筒照射後才看得清楚。我和組員再對照課本，將光路修正為『手電筒 → 書本 → 眼睛』。」</p><p>這張紀錄能幫助教師看出學生是否理解修正的理由，也讓學生練習用自己的話交代 AI 提供了什麼協助、自己又是怎麼判斷的。</p>`},
+{n:'楊尹茜',h:`<p>經此番教案析論，余之最大所得，乃重新體認教師於探究式教學中之角色。師者不必於課始即盡授其知，而當設情境、善設問，引學生生疑發問，並提供驗證所思之機會。尤當學生存有迷思概念之時，教師不宜遽然糾正其答，應先究其所以然，再藉實驗、討論與證據，引導學生逐步辨析、修正其所知。</p><p>余以為，善課之要，不在於數位工具之多寡，亦不在於教學活動之繁簡，而在於各項活動是否皆能扣合學習目標。未來設計課程，期能以學生生活經驗為本，設計啟發思考之問題，使其得以提出假設、親身驗證、表達己見，並於異議交流之中修正所學。復適度運用數位科技，拓展學習之途，然始終以學生之學習需求為本，使科技成為啟思探究之助力。</p>`},
+{n:'許珮紘',h:`<p>透過本次教案分析，我發現數位科技不只是輔助教學的工具，更能幫助學生理解抽象的科學概念。本教案結合5E探究模式、四學模式及生成式AI，讓學生透過自主學習、小組討論與實驗驗證，培養科學探究及獨立思考的能力。</p><p>其中，我認為最值得學習的是將AI作為學生的學習夥伴，而非直接提供答案的工具。不過，過多的數位工具也可能增加學生的學習負擔，因此教師應適當調整。</p><p>我認為數位教學的重點不在於使用多少科技，而在於科技是否真正幫助學生學習與思考。</p>`}
+];
+try{const s=JSON.parse(localStorage.getItem(K));if(Array.isArray(s)&&s.length)R=s}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(R))}catch(e){}}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function render(){$('revList').innerHTML=R.map((r,i)=>'<div class="card"><h3 class="who">'+esc(r.n)+'</h3>'+(r.h?'<div class="rich">'+r.h+'</div>':'<p>'+esc(r.t).replace(/\n/g,'<br>')+'</p>')+(1?'<p style="text-align:right"><button class="btn" data-i="'+i+'">刪除</button></p>':'')+'</div>').join('')}
+$('revList').onclick=e=>{const i=e.target.dataset.i;if(i){R.splice(+i,1);save();render()}};
+$('rAdd').onclick=()=>{const n=$('rName').value.trim(),t=$('rText').value.trim();if(!n||!t){alert('請填寫姓名與心得');return}
+R.push({n,t});save();render();$('rName').value='';$('rText').value=''};
+render();
+
+const K2='lightTeam2';let T=[
+{n:'張宇慧',t:'中文碩專三夜　T1132102　｜　分工：全部一起'},
+{n:'楊尹茜',t:'國碩三　M11322002　｜　分工：全部一起'},
+{n:'陳枻安',t:'教科碩二　M11439004　｜　分工：全部一起'},
+{n:'許珮紘',t:'特教三　S11340017　｜　分工：全部一起'},
+{n:'蘇綵婕',t:'特教三　S11340011　｜　分工：全部一起'}
+];
+try{const s=JSON.parse(localStorage.getItem(K2));if(Array.isArray(s)&&s.length)T=s}catch(e){}
+function save2(){try{localStorage.setItem(K2,JSON.stringify(T))}catch(e){}}
+function render2(){$('tmList').innerHTML=T.map((r,i)=>'<div class="card"><h3 class="who">'+esc(r.n)+'</h3><p>'+esc(r.t)+'</p><p style="text-align:right"><button class="btn" data-j="'+i+'">刪除</button></p></div>').join('')}
+$('tmList').onclick=e=>{const i=e.target.dataset.j;if(i){T.splice(+i,1);save2();render2()}};
+$('tAdd').onclick=()=>{const n=$('tName').value.trim(),t=$('tTask').value.trim();if(!n||!t){alert('請填寫姓名與負責工作');return}
+T.push({n,t});save2();render2();$('tName').value='';$('tTask').value=''};
+render2();
+</script>
+</body>
+</html>
